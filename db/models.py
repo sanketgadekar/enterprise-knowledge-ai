@@ -23,15 +23,24 @@ class Company(Base):
     __tablename__ = "companies"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String(255), nullable=False, unique=True)
+
+    # Display name (NOT unique)
+    name = Column(String(255), nullable=False)
+
+    # Unique tenant identifier
+    slug = Column(String(100), nullable=False, unique=True, index=True)
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships
-    users = relationship("User", back_populates="company", cascade="all, delete")
+    users = relationship(
+        "User",
+        back_populates="company",
+        cascade="all, delete",
+    )
 
     def __repr__(self) -> str:
-        return f"<Company id={self.id} name={self.name}>"
-
+        return f"<Company id={self.id} slug={self.slug}>"
 
 
 # =========================
@@ -59,7 +68,7 @@ class User(Base):
     # Relationships
     company = relationship("Company", back_populates="users")
 
-    # Unique per company
+    # Unique email per company
     __table_args__ = (
         UniqueConstraint("company_id", "email", name="uq_company_email"),
         Index("idx_user_company", "company_id"),

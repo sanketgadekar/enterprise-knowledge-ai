@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # Chunking
     chunk_size: int = Field(..., env="CHUNK_SIZE")
     chunk_overlap: int = Field(..., env="CHUNK_OVERLAP")
-    
+
     # Logging
     log_level: str = "INFO"
     log_file: str = "logs/app.log"
@@ -33,6 +33,13 @@ class Settings(BaseSettings):
     # Database
     database_url: str
     database_echo: bool = False
+
+    # =========================
+    # JWT (ADD THIS SECTION)
+    # =========================
+    jwt_secret_key: str = Field(..., env="JWT_SECRET_KEY")
+    jwt_algorithm: str = Field("HS256", env="JWT_ALGORITHM")
+    jwt_expire_minutes: int = Field(60, env="JWT_EXPIRE_MINUTES")
 
     class Config:
         env_file = ".env"
@@ -42,5 +49,6 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()
+
 
 settings = get_settings()
