@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_file: str = "logs/app.log"
 
+    # Database
+    database_url: str
+    database_echo: bool = False
+
     class Config:
         env_file = ".env"
         case_sensitive = False

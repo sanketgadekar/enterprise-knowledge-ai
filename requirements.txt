@@ -9,3 +9,9 @@ faiss-cpu
 chromadb
 python-multipart
 loguru
+sqlalchemy>=2.0
+asyncpg
+alembic
+pydantic-settings
+python-jose[cryptography]
+argon2-cffi
