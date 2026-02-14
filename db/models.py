@@ -9,11 +9,13 @@ from sqlalchemy import (
     ForeignKey,
     UniqueConstraint,
     Index,
+    Enum as SqlEnum,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from db.session import Base
+from core.constants import UserRole
 
 
 # =========================
@@ -54,7 +56,12 @@ class User(Base):
     email = Column(String(255), nullable=False)
     hashed_password = Column(String(255), nullable=False)
 
-    role = Column(String(50), nullable=False)  # "admin" | "user"
+    # 🔐 Production-grade enum role
+    role = Column(
+        SqlEnum(UserRole, name="user_role_enum"),
+        nullable=False,
+    )
+
     is_active = Column(Boolean, default=True)
 
     company_id = Column(

@@ -7,6 +7,7 @@ from db.models import Company, User
 from core.security import hash_password, verify_password
 from core.utils import generate_slug
 
+from core.constants import UserRole
 
 class CompanyService:
 
@@ -31,7 +32,7 @@ class CompanyService:
         new_admin = User(
             email=admin_email,
             hashed_password=hash_password(admin_password),
-            role="admin",
+            role=UserRole.ADMIN,
             company=new_company,
         )
 

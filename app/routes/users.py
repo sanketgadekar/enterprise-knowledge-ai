@@ -6,7 +6,7 @@ from db.session import get_db
 from db.models import User
 from app.schemas.user_schema import UserResponse
 from app.dependencies.auth_dependency import get_current_user
-
+from app.dependencies.roles import get_current_admin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
