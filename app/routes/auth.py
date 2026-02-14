@@ -68,3 +68,15 @@ async def login(
     )
 
     return TokenResponse(access_token=access_token)
+
+
+# add protected route example
+from app.dependencies.auth_dependency import get_current_user
+
+
+@router.get("/me")
+async def get_me(current_user=Depends(get_current_user)):
+    return {
+        "message": "Authenticated",
+        "user": current_user,
+    }
