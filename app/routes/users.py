@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel, EmailStr
 
+
 from db.session import get_db
 from db.models import User
 from app.schemas.user_schema import UserResponse
@@ -10,6 +11,8 @@ from app.dependencies.auth_dependency import get_current_user
 from app.dependencies.roles import get_current_admin
 from core.constants import UserRole
 from services.user_service import UserService
+from app.dependencies.permission import require_permission
+from core.permissions import Permission
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -72,7 +75,9 @@ class CreateUserRequest(BaseModel):
 async def create_user(
     payload: CreateUserRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(
+    require_permission(Permission.USERS_CREATE)
+),
 ):
     try:
         user = await UserService.create_user(
