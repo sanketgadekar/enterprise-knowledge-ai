@@ -83,3 +83,34 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email} role={self.role}>"
+
+
+# =========================
+# Document Model
+# =========================
+class Document(Base):
+    __tablename__ = "documents"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    company_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("companies.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    filename = Column(String(255), nullable=False)
+    file_path = Column(String(500), nullable=False)
+
+    status = Column(String(50), default="pending")  # pending | processing | completed | failed
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    company = relationship("Company")
+
+    __table_args__ = (
+        Index("idx_document_company", "company_id"),
+    )
+
+    def __repr__(self):
+        return f"<Document id={self.id} status={self.status}>"
