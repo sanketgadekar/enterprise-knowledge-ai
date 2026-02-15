@@ -54,21 +54,27 @@ async def login(
     payload: LoginRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    user, company = await CompanyService.authenticate_user(
-        db=db,
-        company_slug=payload.company_slug,
-        email=payload.email,
-        password=payload.password,
-    )
+    try:
+        user, company = await CompanyService.authenticate_user(
+            db=db,
+            company_slug=payload.company_slug,
+            email=payload.email,
+            password=payload.password,
+        )
 
-    access_token = create_access_token(
-        user_id=user.id,
-        company_id=company.id,
-        role=user.role,
-    )
+        access_token = create_access_token(
+            user_id=user.id,
+            company_id=company.id,
+            role=user.role,
+        )
 
-    return TokenResponse(access_token=access_token)
+        return TokenResponse(access_token=access_token)
 
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    except PermissionError:
+        raise HTTPException(status_code=403, detail="Inactive account")
 
 # add protected route example
 from app.dependencies.auth_dependency import get_current_user
