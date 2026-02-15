@@ -6,3 +6,11 @@ class UserRole(str, Enum):
     MANAGER = "manager"
     USER = "user"
     VIEWER = "viewer"
+
+
+ROLE_HIERARCHY = {
+    UserRole.ADMIN: 4,
+    UserRole.MANAGER: 3,
+    UserRole.USER: 2,
+    UserRole.VIEWER: 1,
+}
