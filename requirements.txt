@@ -1,19 +1,40 @@
-fastapi
-uvicorn[standard]
-python-dotenv
-pydantic
-openai
-langchain
-tiktoken
-faiss-cpu
-chromadb
-python-multipart
-loguru
-sqlalchemy>=2.0
-asyncpg
-alembic
-pydantic-settings
-python-jose[cryptography]
-argon2-cffi
-email-validator
-sentence-transformers
+# -------------------------
+# Core API
+# -------------------------
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-dotenv==1.0.1
+pydantic==2.7.4
+pydantic-settings==2.2.1
+
+# -------------------------
+# Database
+# -------------------------
+sqlalchemy==2.0.30
+asyncpg==0.29.0
+alembic==1.13.1
+
+# -------------------------
+# Auth & Security
+# -------------------------
+python-jose[cryptography]==3.3.0
+argon2-cffi==23.1.0
+email-validator==2.1.1
+
+# -------------------------
+# File Handling
+# -------------------------
+python-multipart==0.0.9
+
+# -------------------------
+# Logging
+# -------------------------
+loguru==0.7.2
+
+# -------------------------
+# Embeddings / Vector Store
+# -------------------------
+faiss-cpu==1.8.0
+sentence-transformers==2.7.0
+torch==2.3.1
+numpy==1.26.4

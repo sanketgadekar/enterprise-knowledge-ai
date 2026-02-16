@@ -1,0 +1,21 @@
+2026-02-16 14:06:44 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:06:48 | WARNING | huggingface_hub.file_download | Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2026-02-16 14:06:58 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:13:32 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:13:35 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:20:13 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:20:16 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:22:23 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:22:26 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:26:12 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:26:14 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:26:34 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:26:37 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:31:00 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:31:04 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:31:32 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:31:34 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:34:41 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:34:45 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-16 14:38:40 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-16 14:38:44 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu

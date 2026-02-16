@@ -19,26 +19,20 @@ class IngestionService:
                 return
 
             try:
-                # --------------------------------------------------
                 # 1️⃣ Mark document as processing
-                # --------------------------------------------------
                 document.status = "processing"
                 await db.commit()
 
-                # --------------------------------------------------
-                # 2️⃣ Load file content
-                # --------------------------------------------------
+                # 2️⃣ Load file
                 with open(
                     document.file_path,
                     "r",
                     encoding="utf-8",
-                    errors="ignore"
+                    errors="ignore",
                 ) as f:
                     text = f.read()
 
-                # --------------------------------------------------
-                # 3️⃣ Split text into chunks
-                # --------------------------------------------------
+                # 3️⃣ Split text
                 chunks = simple_chunk_text(text)
 
                 if not chunks:
@@ -46,9 +40,7 @@ class IngestionService:
                     await db.commit()
                     return
 
-                # --------------------------------------------------
                 # 4️⃣ Store chunks in SQL
-                # --------------------------------------------------
                 chunk_objects = []
 
                 for idx, chunk_text in enumerate(chunks):
@@ -63,33 +55,34 @@ class IngestionService:
                 db.add_all(chunk_objects)
                 await db.commit()
 
-                # Refresh to get chunk IDs
                 for chunk in chunk_objects:
                     await db.refresh(chunk)
 
-                # --------------------------------------------------
                 # 5️⃣ Generate embeddings
-                # --------------------------------------------------
                 embedding_model = get_embedding_model()
-
                 texts = [chunk.content for chunk in chunk_objects]
-
                 embeddings = await embedding_model.embed_documents(texts)
 
-                # --------------------------------------------------
-                # 6️⃣ Store embeddings in FAISS (isolated per company)
-                # --------------------------------------------------
+                # 6️⃣ Store in FAISS (per-company isolation)
+                namespace = f"company_{document.company_id}"
+
                 vector_store = get_vector_store()
 
-                await vector_store.add_embeddings(
-                    company_id=str(document.company_id),
-                    ids=[str(chunk.id) for chunk in chunk_objects],
+                await vector_store.add_documents(
+                    namespace=namespace,
                     embeddings=embeddings,
+                    documents=texts,
+                    metadatas=[
+                        {
+                            "chunk_id": str(chunk.id),
+                            "document_id": str(document.id),
+                            "company_id": str(document.company_id),
+                        }
+                        for chunk in chunk_objects
+                    ],
                 )
 
-                # --------------------------------------------------
                 # 7️⃣ Mark as completed
-                # --------------------------------------------------
                 document.status = "completed"
                 await db.commit()
 
