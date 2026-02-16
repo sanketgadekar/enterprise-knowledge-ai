@@ -26,15 +26,17 @@ class Company(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
-    # Display name (NOT unique)
     name = Column(String(255), nullable=False)
-
-    # Unique tenant identifier
     slug = Column(String(100), nullable=False, unique=True, index=True)
+
+    # --------------------------------------------------
+    # LLM Configuration (Per Company)
+    # --------------------------------------------------
+    llm_provider = Column(String(50), default="ollama")  # "ollama" | "openai"
+    openai_api_key = Column(String(255), nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relationships
     users = relationship(
         "User",
         back_populates="company",
@@ -42,8 +44,7 @@ class Company(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<Company id={self.id} slug={self.slug}>"
-
+        return f"<Company id={self.id} slug={self.slug} provider={self.llm_provider}>"
 
 # =========================
 # User Model
