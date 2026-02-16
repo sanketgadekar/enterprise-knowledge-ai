@@ -114,3 +114,33 @@ class Document(Base):
 
     def __repr__(self):
         return f"<Document id={self.id} status={self.status}>"
+
+# =========================
+# Document Chunk Model
+# =========================
+class DocumentChunk(Base):
+    __tablename__ = "document_chunks"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    document_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("documents.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    company_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("companies.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    content = Column(String, nullable=False)
+    chunk_index = Column(String(50), nullable=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        Index("idx_chunk_company", "company_id"),
+        Index("idx_chunk_document", "document_id"),
+    )
