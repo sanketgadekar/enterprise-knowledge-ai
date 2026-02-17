@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -15,7 +15,7 @@ class RetrievalService:
         company_id: str,
         query: str,
         top_k: int = 5,
-    ) -> List[str]:
+    ) -> List[Dict]:
 
         # 1️⃣ Embed query
         embedding_model = get_embedding_model()
@@ -25,26 +25,25 @@ class RetrievalService:
         namespace = f"company_{company_id}"
         vector_store = get_vector_store()
 
-        results = await vector_store.similarity_search(
+        search_results = await vector_store.similarity_search(
             namespace=namespace,
             query_embedding=query_embedding,
             top_k=top_k,
         )
 
-        if not results:
+        if not search_results:
             return []
 
-        # 3️⃣ Extract chunk IDs from metadata
         chunk_ids = [
             item["metadata"]["chunk_id"]
-            for item in results
+            for item in search_results
             if "metadata" in item and "chunk_id" in item["metadata"]
         ]
 
         if not chunk_ids:
             return []
 
-        # 4️⃣ Fetch chunks safely from SQL
+        # 3️⃣ Fetch full chunk objects from SQL
         result = await db.execute(
             select(DocumentChunk).where(
                 DocumentChunk.id.in_(chunk_ids),
@@ -54,4 +53,13 @@ class RetrievalService:
 
         chunks = result.scalars().all()
 
-        return [chunk.content for chunk in chunks]
+        # 4️⃣ Return structured data
+        return [
+            {
+                "chunk_id": str(chunk.id),
+                "document_id": str(chunk.document_id),
+                "chunk_index": chunk.chunk_index,
+                "content": chunk.content,
+            }
+            for chunk in chunks
+        ]
