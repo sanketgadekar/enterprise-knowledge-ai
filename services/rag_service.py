@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from services.retrieval_service import RetrievalService
 from llm.factory import get_llm
-from db.models import Company
+from db.models import Company, ChatMessage
 
 
 class RAGService:
@@ -14,6 +14,7 @@ class RAGService:
         db: AsyncSession,
         company_id: str,
         query: str,
+        session_id: str,
     ) -> Dict:
 
         # -------------------------------------------------
@@ -31,7 +32,23 @@ class RAGService:
             }
 
         # -------------------------------------------------
-        # 2️⃣ Retrieve structured chunks
+        # 2️⃣ Load recent conversation history
+        # -------------------------------------------------
+        history_result = await db.execute(
+            select(ChatMessage)
+            .where(ChatMessage.session_id == session_id)
+            .order_by(ChatMessage.created_at.desc())
+            .limit(5)
+        )
+
+        history_messages = history_result.scalars().all()
+
+        history_text = ""
+        for msg in reversed(history_messages):
+            history_text += f"{msg.role.upper()}: {msg.content}\n"
+
+        # -------------------------------------------------
+        # 3️⃣ Retrieve structured chunks
         # -------------------------------------------------
         chunks: List[Dict] = await RetrievalService.retrieve_context(
             db=db,
@@ -47,7 +64,7 @@ class RAGService:
             }
 
         # -------------------------------------------------
-        # 3️⃣ Build structured context
+        # 4️⃣ Build structured context
         # -------------------------------------------------
         formatted_chunks = []
 
@@ -66,15 +83,18 @@ If the answer is not in the context, say you don't know.
 """
 
         user_prompt = f"""
+Previous Conversation:
+{history_text}
+
 Context:
 {context_text}
 
-Question:
+Current Question:
 {query}
 """
 
         # -------------------------------------------------
-        # 4️⃣ Get LLM for THIS company
+        # 5️⃣ Get LLM for THIS company
         # -------------------------------------------------
         llm = get_llm(company)
 
@@ -84,7 +104,7 @@ Question:
         )
 
         # -------------------------------------------------
-        # 5️⃣ Return structured response
+        # 6️⃣ Return structured response
         # -------------------------------------------------
         return {
             "answer": answer,
