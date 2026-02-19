@@ -8,6 +8,12 @@ from services.retrieval_service import RetrievalService
 from services.rag_service import RAGService
 from db.models import ChatSession, ChatMessage
 
+
+from db.models import ChatSession
+from sqlalchemy import select
+from db.models import ChatMessage
+from sqlalchemy import delete
+
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
@@ -99,3 +105,73 @@ async def chat(
         "answer": result["answer"],
         "sources": result["sources"],
     }
+
+# List User Chat Sessions
+
+@router.get("/sessions")
+async def list_sessions(
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(ChatSession)
+        .where(ChatSession.user_id == current_user["user_id"])
+        .order_by(ChatSession.created_at.desc())
+    )
+
+    sessions = result.scalars().all()
+
+    return [
+        {
+            "session_id": str(session.id),
+            "created_at": session.created_at,
+        }
+        for session in sessions
+    ]
+
+
+
+#Get Messages of a Session
+
+@router.get("/sessions/{session_id}")
+async def get_session_messages(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(ChatMessage)
+        .where(ChatMessage.session_id == session_id)
+        .order_by(ChatMessage.created_at.asc())
+    )
+
+    messages = result.scalars().all()
+
+    return [
+        {
+            "role": msg.role,
+            "content": msg.content,
+            "created_at": msg.created_at,
+        }
+        for msg in messages
+    ]
+
+
+# Delete a chat session and its messages
+
+@router.delete("/sessions/{session_id}")
+async def delete_session(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    await db.execute(
+        delete(ChatSession).where(
+            ChatSession.id == session_id,
+            ChatSession.user_id == current_user["user_id"],
+        )
+    )
+
+    await db.commit()
+
+    return {"message": "Session deleted successfully"}
