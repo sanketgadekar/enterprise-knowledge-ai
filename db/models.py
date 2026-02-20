@@ -10,16 +10,13 @@ from sqlalchemy import (
     UniqueConstraint,
     Index,
     Enum as SqlEnum,
+    Text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from db.session import Base
 from core.constants import UserRole
-
-
-from sqlalchemy import ForeignKey, Text
-from sqlalchemy.orm import relationship
 
 
 # =========================
@@ -33,9 +30,7 @@ class Company(Base):
     name = Column(String(255), nullable=False)
     slug = Column(String(100), nullable=False, unique=True, index=True)
 
-    # --------------------------------------------------
     # LLM Configuration (Per Company)
-    # --------------------------------------------------
     llm_provider = Column(String(50), default="ollama")  # "ollama" | "openai"
     openai_api_key = Column(String(255), nullable=True)
 
@@ -50,6 +45,7 @@ class Company(Base):
     def __repr__(self) -> str:
         return f"<Company id={self.id} slug={self.slug} provider={self.llm_provider}>"
 
+
 # =========================
 # User Model
 # =========================
@@ -61,7 +57,6 @@ class User(Base):
     email = Column(String(255), nullable=False)
     hashed_password = Column(String(255), nullable=False)
 
-    # 🔐 Production-grade enum role
     role = Column(
         SqlEnum(UserRole, name="user_role_enum"),
         nullable=False,
@@ -77,10 +72,8 @@ class User(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relationships
     company = relationship("Company", back_populates="users")
 
-    # Unique email per company
     __table_args__ = (
         UniqueConstraint("company_id", "email", name="uq_company_email"),
         Index("idx_user_company", "company_id"),
@@ -120,6 +113,7 @@ class Document(Base):
     def __repr__(self):
         return f"<Document id={self.id} status={self.status}>"
 
+
 # =========================
 # Document Chunk Model
 # =========================
@@ -150,28 +144,56 @@ class DocumentChunk(Base):
         Index("idx_chunk_document", "document_id"),
     )
 
-# =========================
-# Database Model
-# =========================
 
+# =========================
+# Chat Session Model
+# =========================
 class ChatSession(Base):
     __tablename__ = "chat_sessions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+
+    company_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("companies.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    # NEW: conversation title
+    title = Column(String(255), nullable=True)
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    messages = relationship("ChatMessage", back_populates="session")
+    messages = relationship(
+        "ChatMessage",
+        back_populates="session",
+        cascade="all, delete-orphan",
+    )
 
 
+# =========================
+# Chat Message Model
+# =========================
 class ChatMessage(Base):
     __tablename__ = "chat_messages"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    session_id = Column(UUID(as_uuid=True), ForeignKey("chat_sessions.id"), nullable=False)
+
+    session_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("chat_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
     role = Column(String(20), nullable=False)  # "user" | "assistant"
     content = Column(Text, nullable=False)
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     session = relationship("ChatSession", back_populates="messages")

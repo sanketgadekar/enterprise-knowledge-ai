@@ -63,6 +63,7 @@ async def chat(
         session = ChatSession(
             company_id=current_user["company_id"],
             user_id=current_user["user_id"],
+            title=query[:50],
         )
         db.add(session)
         await db.commit()
@@ -124,6 +125,7 @@ async def list_sessions(
     return [
         {
             "session_id": str(session.id),
+            "title": session.title,
             "created_at": session.created_at,
         }
         for session in sessions
