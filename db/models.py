@@ -152,30 +152,17 @@ class ChatSession(Base):
     __tablename__ = "chat_sessions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
 
-    company_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("companies.id", ondelete="CASCADE"),
-        nullable=False,
-    )
-
-    user_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
-    )
-
-    # NEW: conversation title
     title = Column(String(255), nullable=True)
+
+    # NEW 👇
+    memory_summary = Column(Text, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    messages = relationship(
-        "ChatMessage",
-        back_populates="session",
-        cascade="all, delete-orphan",
-    )
-
+    messages = relationship("ChatMessage", back_populates="session")
 
 # =========================
 # Chat Message Model

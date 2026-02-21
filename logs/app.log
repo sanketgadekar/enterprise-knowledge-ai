@@ -130,3 +130,8 @@
 2026-02-20 11:51:48 | WARNING | huggingface_hub.utils._http | Retrying in 4s [Retry 3/5].
 2026-02-20 11:51:52 | WARNING | huggingface_hub.utils._http | '(MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json (Caused by NameResolutionError("HTTPSConnection(host=\'huggingface.co\', port=443): Failed to resolve \'huggingface.co\' ([Errno 11001] getaddrinfo failed)"))'), '(Request ID: 2b3482f0-1da2-46fe-8759-e21b7f8f41a5)')' thrown while requesting HEAD https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/resolve/main/config.json
 2026-02-20 11:51:52 | WARNING | huggingface_hub.utils._http | Retrying in 8s [Retry 4/5].
+2026-02-21 14:04:33 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-21 14:04:38 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-21 14:29:57 | INFO | sentence_transformers.SentenceTransformer | Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2026-02-21 14:30:02 | INFO | sentence_transformers.SentenceTransformer | Use pytorch device_name: cpu
+2026-02-21 14:31:11 | INFO | httpx | HTTP Request: POST http://localhost:11434/api/generate "HTTP/1.1 200 OK"
