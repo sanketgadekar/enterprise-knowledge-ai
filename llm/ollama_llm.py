@@ -9,7 +9,7 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 
 class OllamaLLM(BaseLLM):
 
-    def __init__(self, model: str = "phi3:mini"):
+    def __init__(self, model: str = "tinyllama"):
         self.model = model
 
     # =====================================================

@@ -1,20 +1,15 @@
 import streamlit as st
-from utils import api_post
+from utils import login
 
 st.title("Login")
 
+slug = st.text_input("Company Slug")
 email = st.text_input("Email")
 password = st.text_input("Password", type="password")
 
 if st.button("Login"):
-    response = api_post("/auth/login", json={
-        "email": email,
-        "password": password,
-    })
-
-    if response.status_code == 200:
-        st.session_state.jwt = response.json()["access_token"]
+    if login(slug, email, password):
         st.success("Login successful")
-        st.rerun()
+        st.switch_page("pages/3_Dashboard.py")
     else:
         st.error("Invalid credentials")

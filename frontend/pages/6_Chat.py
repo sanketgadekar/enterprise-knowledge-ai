@@ -1,57 +1,72 @@
 import streamlit as st
-import requests
-from utils import api_get, api_post, api_delete, API_BASE, get_headers
+from components.auth_guard import require_login
+from components.sidebar import render_sidebar
+from utils import chat
 
-st.title("💬 Enterprise Chat")
+require_login()
+render_sidebar()
 
-if "jwt" not in st.session_state:
-    st.warning("Please login first.")
-    st.stop()
+st.title("💬 Enterprise AI Chat")
 
-# -----------------------------
-# Load Sessions
-# -----------------------------
-sessions_resp = api_get("/chat/sessions")
-sessions = sessions_resp.json() if sessions_resp.status_code == 200 else []
 
-st.sidebar.title("Sessions")
+# -------------------------------
+# SESSION STATE INIT
+# -------------------------------
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-if st.sidebar.button("➕ New Chat"):
-    st.session_state.session_id = None
-
-for s in sessions:
-    if st.sidebar.button(s["session_id"]):
-        st.session_state.session_id = s["session_id"]
-
-    if st.sidebar.button("❌", key=f"del_{s['session_id']}"):
-        api_delete(f"/chat/sessions/{s['session_id']}")
-        st.rerun()
-
-# -----------------------------
-# Start new session automatically
-# -----------------------------
 if "session_id" not in st.session_state:
     st.session_state.session_id = None
 
-# -----------------------------
-# Chat Input
-# -----------------------------
-prompt = st.chat_input("Ask your knowledge base...")
+
+# -------------------------------
+# DISPLAY CHAT HISTORY
+# -------------------------------
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
+
+
+# -------------------------------
+# CHAT INPUT (ChatGPT style box)
+# -------------------------------
+prompt = st.chat_input("Ask something...")
 
 if prompt:
-    response = requests.post(
-        f"{API_BASE}/chat/?query={prompt}&session_id={st.session_state.session_id}",
-        headers=get_headers(),
-        stream=True
+
+    # 1️⃣ Show user message
+    st.session_state.messages.append(
+        {"role": "user", "content": prompt}
     )
 
-    full_text = ""
-    placeholder = st.empty()
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-    for chunk in response.iter_content(chunk_size=None):
-        if chunk:
-            text = chunk.decode()
-            full_text += text
-            placeholder.markdown(full_text)
+    # 2️⃣ Call API
+    response = chat(
+        query=prompt,
+        session_id=st.session_state.session_id
+    )
 
-    st.rerun()
+    if response.status_code == 200:
+
+        data = response.json()
+
+        # adjust depending on backend response format
+        answer = data.get("answer", str(data))
+
+        # if backend returns session id
+        if "session_id" in data:
+            st.session_state.session_id = data["session_id"]
+
+        # 3️⃣ Store assistant reply
+        st.session_state.messages.append(
+            {"role": "assistant", "content": answer}
+        )
+
+        # 4️⃣ Display assistant reply
+        with st.chat_message("assistant"):
+            st.markdown(answer)
+
+    else:
+        st.error(response.text)

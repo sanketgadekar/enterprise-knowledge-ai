@@ -1,17 +1,23 @@
 import streamlit as st
-from utils import api_post
+from components.auth_guard import require_login
+from utils import upload_file
+import streamlit as st
+from components.auth_guard import require_login
+from components.sidebar import render_sidebar
+
+require_login()
+render_sidebar()
+
+st.title("Dashboard")
+require_login()
 
 st.title("Upload Document")
 
-if "jwt" not in st.session_state:
-    st.stop()
+file = st.file_uploader("Upload File")
 
-file = st.file_uploader("Upload file")
-
-if st.button("Upload") and file:
-    response = api_post("/ingest/upload", files={"file": file})
-
-    if response.status_code == 200:
-        st.success("Uploaded successfully")
+if file and st.button("Upload"):
+    r = upload_file(file)
+    if r.status_code == 200:
+        st.success("Uploaded")
     else:
-        st.error(response.text)
+        st.error(r.text)
