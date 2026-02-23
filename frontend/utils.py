@@ -56,12 +56,19 @@ def create_user(email, password, role):
 # ---------------- UPLOAD ----------------
 
 def upload_file(file):
-    files = {"file": file}
-    return requests.post(
-        f"{API_BASE}/ingest/upload",
+
+    # ✅ MUST be a DICTIONARY (not {})
+    files = {
+        "file": (file.name, file, file.type)
+    }
+
+    response = requests.post(
+        f"{API_BASE}/ingest/upload/",   # correct endpoint
         files=files,
         headers=headers()
     )
+
+    return response
 
 
 # ---------------- CHAT ----------------
