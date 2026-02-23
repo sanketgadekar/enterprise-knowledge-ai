@@ -1,3 +1,0 @@
-This is a test document.
-Enterprise AI is powerful.
-Multi-tenant isolation is critical.

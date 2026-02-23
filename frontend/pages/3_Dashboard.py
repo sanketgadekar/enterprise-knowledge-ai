@@ -10,5 +10,4 @@ render_sidebar()
 st.title("Dashboard")
 require_login()
 
-st.title("Dashboard")
 st.write("Welcome to Enterprise AI System")
