@@ -28,17 +28,17 @@ Enterprise Knowledge AI enables companies to turn their internal documents into 
 
 ```
 ┌─────────────────┐       ┌──────────────────┐       ┌──────────────────┐
-│  Streamlit UI    │──────▶│   FastAPI Backend │──────▶│   PostgreSQL      │
-│  (frontend/)     │       │   (app/)          │       │   (db/)           │
+│  Streamlit UI   │────▶  │  FastAPI Backend │──────▶│  PostgreSQL     │
+│  (frontend/)    │       │   (app/)         │       │   (db/)          │
 └─────────────────┘       └──────────────────┘       └──────────────────┘
                                     │
                   ┌─────────────────┼─────────────────┐
                   ▼                 ▼                 ▼
           ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-          │ Ingestion     │  │ RAG /         │  │ Vector Store  │
-          │ Service       │  │ Retrieval     │  │ (FAISS /      │
-          │ (chunking +   │  │ Service       │  │  Chroma /     │
-          │ embedding)    │  │ (LLM + cite)  │  │  Pinecone)    │
+          │ Ingestion    │  │ RAG /        │  │ Vector Store │
+          │ Service      │  │ Retrieval    │  │ (FAISS /     │
+          │ (chunking +  │  │ Service      │  │  Chroma /    │
+          │ embedding)   │  │ (LLM + cite) │  │  Pinecone)   │
           └──────────────┘  └──────────────┘  └──────────────┘
 ```
 
