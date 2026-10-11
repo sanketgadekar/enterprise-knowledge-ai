@@ -10,7 +10,11 @@ class Settings(BaseSettings):
 
     # LLM
     llm_provider: str = Field(..., env="LLM_PROVIDER")
-    openai_api_key: str | None = Field(None, env="OPENAI_API_KEY")
+    groq_api_key: str | None = Field(None, env="GROQ_API_KEY")
+    groq_model: str = Field(
+        "openai/gpt-oss-120b",
+        env="GROQ_MODEL"
+    )
 
     # Vector DB
     vector_db: str = Field(..., env="VECTOR_DB")

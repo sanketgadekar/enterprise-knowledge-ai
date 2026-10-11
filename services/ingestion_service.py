@@ -1,9 +1,40 @@
+from pathlib import Path
+
+from pypdf import PdfReader
+
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from db.session import async_session_maker
 from db.models import Document, DocumentChunk
 from core.text_splitter import simple_chunk_text
 from embeddings.factory import get_embedding_model
 from vector_store.factory import get_vector_store
+
+
+def extract_document_text(file_path: str) -> str:
+    """Extract readable text from a supported document."""
+
+    path = Path(file_path)
+    extension = path.suffix.lower()
+
+    if extension == ".pdf":
+        reader = PdfReader(str(path))
+
+        pages = []
+        for page in reader.pages:
+            page_text = page.extract_text() or ""
+            pages.append(page_text)
+
+        return "\n".join(pages)
+
+    elif extension in {".txt", ".md", ".csv"}:
+        return path.read_text(encoding="utf-8-sig")
+
+    else:
+        raise ValueError(
+            f"Unsupported file type: {extension}. "
+            "Supported formats: PDF, TXT, MD, CSV."
+        )
 
 
 class IngestionService:
@@ -19,28 +50,28 @@ class IngestionService:
                 return
 
             try:
-                # 1️⃣ Mark document as processing
+                # 1. Mark document as processing
                 document.status = "processing"
                 await db.commit()
 
-                # 2️⃣ Load file
-                with open(
-                    document.file_path,
-                    "r",
-                    encoding="utf-8",
-                    errors="ignore",
-                ) as f:
-                    text = f.read()
+                # 2. Extract actual text from the file
+                text = extract_document_text(document.file_path)
 
-                # 3️⃣ Split text
+                if not text.strip():
+                    raise ValueError(
+                        "No readable text found in the document. "
+                        "If this is a scanned PDF, OCR may be required."
+                    )
+
+                # 3. Split extracted text into chunks
                 chunks = simple_chunk_text(text)
 
                 if not chunks:
-                    document.status = "failed"
-                    await db.commit()
-                    return
+                    raise ValueError(
+                        "Text splitting produced no chunks."
+                    )
 
-                # 4️⃣ Store chunks in SQL
+                # 4. Store text chunks in PostgreSQL
                 chunk_objects = []
 
                 for idx, chunk_text in enumerate(chunks):
@@ -55,15 +86,21 @@ class IngestionService:
                 db.add_all(chunk_objects)
                 await db.commit()
 
+                # Retrieve generated database IDs
                 for chunk in chunk_objects:
                     await db.refresh(chunk)
 
-                # 5️⃣ Generate embeddings
+                # 5. Generate embeddings from extracted text chunks
                 embedding_model = get_embedding_model()
-                texts = [chunk.content for chunk in chunk_objects]
-                embeddings = await embedding_model.embed_documents(texts)
 
-                # 6️⃣ Store in FAISS (per-company isolation)
+                texts = [chunk.content for chunk in chunk_objects]
+
+                embeddings = await embedding_model.embed_documents(
+                    texts
+                )
+
+                # 6. Store embeddings in FAISS
+                # Keep each company's vectors isolated
                 namespace = f"company_{document.company_id}"
 
                 vector_store = get_vector_store()
@@ -82,11 +119,26 @@ class IngestionService:
                     ],
                 )
 
-                # 7️⃣ Mark as completed
+                # 7. Mark ingestion as completed
                 document.status = "completed"
                 await db.commit()
 
             except Exception:
-                document.status = "failed"
-                await db.commit()
+                # First recover the failed transaction
+                await db.rollback()
+
+                # Then attempt to record the failure
+                try:
+                    document = await db.get(
+                        Document, document_id
+                    )
+
+                    if document:
+                        document.status = "failed"
+                        await db.commit()
+
+                except Exception:
+                    await db.rollback()
+
+                # Preserve the original exception
                 raise

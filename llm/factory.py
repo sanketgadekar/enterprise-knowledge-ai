@@ -1,12 +1,23 @@
-from llm.openai_llm import OpenAILLM
-from llm.ollama_llm import OllamaLLM
+from core.config import settings
+from llm.groq_llm import GroqLLM
 
 
-def get_llm(company):
+def get_llm(company=None):
 
-    if company.llm_provider == "openai":
-        if not company.openai_api_key:
-            raise ValueError("OpenAI API key not configured.")
-        return OpenAILLM(api_key=company.openai_api_key)
+    provider = settings.llm_provider.lower()
 
-    return OllamaLLM()
+    if provider == "groq":
+
+        if not settings.groq_api_key:
+            raise ValueError(
+                "GROQ_API_KEY is not configured."
+            )
+
+        return GroqLLM(
+            api_key=settings.groq_api_key,
+            model=settings.groq_model,
+        )
+
+    raise ValueError(
+        f"Unsupported LLM provider: {settings.llm_provider}"
+    )

@@ -3,69 +3,61 @@
 # =============================
 __pycache__/
 *.py[cod]
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
 *$py.class
 
 # Virtual environments
 venv/
-.env/
-.env.*
 .venv/
+env/
 
-# =============================
-# Environment variables
-# =============================
+# Environment variables and secrets
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 
-# =============================
 # Logs
-# =============================
 logs/
 *.log
 
-# =============================
 # Alembic
-# =============================
 alembic/versions/__pycache__/
 
-# =============================
-# Database
-# =============================
+# Local database files
 *.sqlite3
 *.db
 
-# =============================
 # VS Code
-# =============================
 .vscode/
 
-# =============================
-# OS Files
-# =============================
+# OS files
 .DS_Store
 Thumbs.db
 
-# =============================
 # Testing
-# =============================
 .coverage
 htmlcov/
 .pytest_cache/
 
-# =============================
-# MyPy / Type Checking
-# =============================
+# MyPy / Type checking
 .mypy_cache/
 
-# =============================
-# Distribution / Build
-# =============================
+# Build and distribution
 build/
 dist/
 *.egg-info/
 
-# =============================
-# Docker
-# =============================
+# Docker / process files
 *.pid
+
+# Uploaded documents and generated vector data
+storage/files/*
+storage/vector/*
+
+# Keep storage directories in Git
+!storage/files/.gitkeep
+!storage/vector/.gitkeep
