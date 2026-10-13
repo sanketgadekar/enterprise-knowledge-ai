@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 25% 97%;
+    --foreground: 222 35% 11%;
+    --card: 0 0% 100%;
+    --border: 214 20% 89%;
+    --input: 214 18% 80%;
+    --ring: 142 72% 29%;
+    --muted: 214 24% 94%;
+    --muted-foreground: 215 16% 38%;
+    --primary: 142 72% 29%;
+    --primary-foreground: 0 0% 100%;
+    --destructive: 0 72% 46%;
+    --navy: 220 45% 9%;
+    --navy-2: 220 40% 14%;
+    --navy-line: 220 30% 20%;
+    --accent-green: 142 69% 58%;
+  }
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+/* Safe rendering of model-written Markdown (HTML is never rendered). */
+.md {
+  @apply text-[0.95rem] leading-relaxed text-foreground;
+  overflow-wrap: anywhere;
+}
+.md > :first-child { @apply mt-0; }
+.md > :last-child { @apply mb-0; }
+.md p { @apply my-3; }
+.md h1, .md h2, .md h3, .md h4 { @apply mb-2 mt-5 font-semibold leading-snug; }
+.md h1 { @apply text-xl; }
+.md h2 { @apply text-lg; }
+.md h3 { @apply text-base; }
+.md ul { @apply my-3 list-disc pl-6; }
+.md ol { @apply my-3 list-decimal pl-6; }
+.md li { @apply my-1; }
+.md a { @apply font-medium text-primary underline underline-offset-2; }
+.md blockquote { @apply my-3 border-l-4 border-border pl-4 text-muted-foreground; }
+.md hr { @apply my-4; }
+.md code { @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em]; }
+.md pre { @apply my-3 overflow-x-auto rounded-lg bg-navy p-4 text-sm text-slate-100; }
+.md pre code { @apply bg-transparent p-0 text-inherit; }
+.md .table-wrap { @apply my-3 overflow-x-auto rounded-lg border; }
+.md table { @apply w-full border-collapse text-sm; }
+.md th { @apply bg-muted px-3 py-2 text-left font-semibold; }
+.md td { @apply border-t px-3 py-2 align-top; }
+
+dialog::backdrop { background: hsl(220 45% 9% / 0.6); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
