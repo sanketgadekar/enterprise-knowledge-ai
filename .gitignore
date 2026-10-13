@@ -1,11 +1,7 @@
+```gitignore
 # =============================
 # Python
 # =============================
-__pycache__/
-*.py[cod]
-.env
-.env.*
-!.env.example
 __pycache__/
 *.py[cod]
 *$py.class
@@ -14,6 +10,7 @@ __pycache__/
 venv/
 .venv/
 env/
+backend/venv/
 
 # Environment variables and secrets
 .env
@@ -23,9 +20,10 @@ env/
 # Logs
 logs/
 *.log
+backend/logs/
 
 # Alembic
-alembic/versions/__pycache__/
+**/alembic/versions/__pycache__/
 
 # Local database files
 *.sqlite3
@@ -43,7 +41,7 @@ Thumbs.db
 htmlcov/
 .pytest_cache/
 
-# MyPy / Type checking
+# MyPy / type checking
 .mypy_cache/
 
 # Build and distribution
@@ -55,9 +53,13 @@ dist/
 *.pid
 
 # Uploaded documents and generated vector data
-storage/files/*
-storage/vector/*
+backend/storage/files/*
+backend/storage/vector/*
 
 # Keep storage directories in Git
-!storage/files/.gitkeep
-!storage/vector/.gitkeep
+!backend/storage/files/.gitkeep
+!backend/storage/vector/.gitkeep
+
+# Frontend dependencies and build
+frontend/node_modules/
+frontend/dist/
